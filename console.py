@@ -33,8 +33,9 @@ from core.flag import *
 #from core.ip_list import *
 from auxi.command import *
 from auxi.upload import *
+import auxi.upload_backpage
 from auxi.shellcrack import *
-import os
+import os,hashlib
 
 
 class MainConsole(Cmd):
@@ -98,12 +99,12 @@ help [x]      show command x's usage and description
         print self.commandHelp
 
     def help_add(self):
-        print "add : usage: add [shell path] [pwd] [type(eval/exec)] [method(get/post)]"
-        print "      example: add :8001//a.php x eval get / add :8002//fuckyou.php?pass=xxxx a eval get"
+        print "add : usage: add [shell path] [pwd] [type(eval/exec)] [method(get/post)] [apath]"
+        print "      example: add :8001//a.php x eval get /var/www/html / add :8002//fuckyou.php?pass=xxxx a eval get /var/www/html"
 
     def do_add(self,argv):
         array = argv.split(' ')
-        if len(array) != 4:
+        if len(array) != 5:
             self.Error("Length Not Standard!")
             self.help_add()
             return
@@ -117,21 +118,21 @@ help [x]      show command x's usage and description
             return
         if array[2] == 'eval':
             if array[3] == 'get':
-                GET_eval_shell_path_pwd(array[0],array[1])
+                GET_eval_shell_path_pwd(array[0],array[1],array[4])
                 print "add ok"
                 return
             if array[3] == 'post':
-                POST_eval_shell_path_pwd(array[0],array[1])
+                POST_eval_shell_path_pwd(array[0],array[1],array[4])
                 print "add ok"
                 return
 
         if array[2] == 'exec':
             if array[3] == 'get':
-                GET_exec_shell_path_pwd(array[0],array[1])
+                GET_exec_shell_path_pwd(array[0],array[1],array[4])
                 print "add ok"
                 return
             if array[3] == 'post':
-                POST_exec_shell_path_pwd(array[0],array[1])
+                POST_exec_shell_path_pwd(array[0],array[1],array[4])
                 print "add ok"
                 return
 
@@ -171,11 +172,15 @@ help [x]      show command x's usage and description
         print "     set ip list , example:ip 192.168.1.1-24 or ip 192.168.2-45.2"
 
     def do_ip(self,argv):
+        global ipList
         array = argv.split('.')
         if len(array) < 4:
             self.Error("Input is wrong")
             self.help_ip()
         ip_list(argv)
+        ipList = return_ip()
+        # print ipList
+
 
     def help_getflag(self):
         print "getflag  : usage : getflag curl xxxx "
@@ -185,7 +190,8 @@ help [x]      show command x's usage and description
     def do_getflag(self,argv):
         global GET_eval_shells_path_pwd,POST_eval_shells_path_pwd,GET_exec_shells_path_pwd,POST_exec_shells_path_pwd
         global command
-
+        # print ipList
+        
         if len(ipList) == 0:
             self.Error("Please set the ip list first!")
             self.help_ip()
@@ -252,6 +258,16 @@ help [x]      show command x's usage and description
     def help_upload(self):
         print "upload : usage: upload <file>(default=shell.php)  #run 'save' at first!"
         print "         upload your file with all eval shells , other file please save in 'auxi/' path"
+
+    def do_upload_backpage(self,argv):
+        if os.path.getsize('auxi/webshell.txt') == 0:
+            self.Error('You have no webshell!Please run save!')
+            return
+        try:
+            auxi.upload_backpage.upload()
+            print "upload ok"
+        except:
+            self.Error('Upload failed')
 
     def do_upload(self,argv):
         if os.path.getsize('auxi/webshell.txt') == 0:

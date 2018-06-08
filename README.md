@@ -1,3 +1,8 @@
+1.修改shell文件的时间
+2.修改flag获取与提交的时间间隔
+3.
+
+
     AWD Predator Framework v2.0                   
 
               --code by AresX       

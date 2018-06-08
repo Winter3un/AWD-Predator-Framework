@@ -8,24 +8,24 @@ from core.ip_list import *
 #GET_eval_shells_path_pwd,POST_eval_shells_path_pwd,GET_exec_shells_path_pwd,POST_exec_shells_path_pwd={},{},{},{}
 
 
-def GET_eval_shell_path_pwd(path,pwd):
+def GET_eval_shell_path_pwd(path,pwd,apath):
     global GET_eval_shells_path_pwd
-    GET_eval_shells_path_pwd[path] = pwd
+    GET_eval_shells_path_pwd[path] = [pwd,apath]
 
 
-def POST_eval_shell_path_pwd(path,pwd):
+def POST_eval_shell_path_pwd(path,pwd,apath):
     global POST_eval_shells_path_pwd
-    POST_eval_shells_path_pwd[path] = pwd
+    POST_eval_shells_path_pwd[path] = [pwd,apath]
 
 
-def GET_exec_shell_path_pwd(path,pwd):
+def GET_exec_shell_path_pwd(path,pwd,apath):
     global GET_exec_shells_path_pwd
-    GET_exec_shells_path_pwd[path] = pwd
+    GET_exec_shells_path_pwd[path] = [pwd,apath]
 
 
-def POST_exec_shell_path_pwd(path,pwd):
+def POST_exec_shell_path_pwd(path,pwd,apath):
     global POST_exec_shells_path_pwd
-    POST_exec_shells_path_pwd[path] = pwd
+    POST_exec_shells_path_pwd[path] = [pwd,apath]
 
 
 def Get_GET_eval_sap():
@@ -46,13 +46,13 @@ def Get_POST_exec_sap():
 
 def show_sap():
     for i in GET_eval_shells_path_pwd:
-        print i + ':' + GET_eval_shells_path_pwd[i] + ' eval get'
+        print i + ':' + GET_eval_shells_path_pwd[i][0] + ' eval get '+GET_eval_shells_path_pwd[i][1]
     for i in POST_eval_shells_path_pwd:
-        print i + ':' + POST_eval_shells_path_pwd[i] + ' eval post'
+        print i + ':' + POST_eval_shells_path_pwd[i][0] + ' eval post '+POST_eval_shells_path_pwd[i][1]
     for i in GET_exec_shells_path_pwd:
-        print i + ':' + GET_exec_shells_path_pwd[i] + ' exec get'
+        print i + ':' + GET_exec_shells_path_pwd[i][0] + ' exec get '+ GET_exec_shells_path_pwd[i][1] 
     for i in POST_exec_shells_path_pwd:
-        print i + ':' + POST_exec_shells_path_pwd[i] + 'exec post'
+        print i + ':' + POST_exec_shells_path_pwd[i][0] + 'exec post '+POST_exec_shells_path_pwd[i][1]
 
 
 # 保存shell路径和密码
@@ -65,7 +65,8 @@ def save_shell_path_pwd():
         pickle.dump(GET_exec_shells_path_pwd,g)
     with open('data/POST_exec.pickle','wb') as u:
         pickle.dump(POST_exec_shells_path_pwd,u)
-    target = open('auxi\webshell.txt','w')
+    target = open('auxi/webshell.txt','wb')
+    ipList = return_ip()
     for i in ipList:
         for j in POST_eval_shells_path_pwd:
             target.write('http://')
@@ -74,7 +75,9 @@ def save_shell_path_pwd():
             target.write(',')
             target.write('post')
             target.write(',')
-            target.write(POST_eval_shells_path_pwd[j])
+            target.write(POST_eval_shells_path_pwd[j][0])
+            target.write(',')
+            target.write(POST_eval_shells_path_pwd[j][1])
             target.write('\n')
         for k in GET_eval_shells_path_pwd:
             target.write('http://')
@@ -83,7 +86,9 @@ def save_shell_path_pwd():
             target.write(',')
             target.write('get')
             target.write(',')
-            target.write(GET_eval_shells_path_pwd[k])
+            target.write(GET_eval_shells_path_pwd[k][0])
+            target.write(',')
+            target.write(GET_eval_shells_path_pwd[k][1])
             target.write('\n')
     target.close()
     print "save ok"

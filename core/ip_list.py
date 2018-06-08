@@ -32,6 +32,9 @@ def print_ip():
     for i in ipList:
         print i
 
+def return_ip():
+    global ipList
+    return ipList
 
 def clear_ip():
     global ipList
